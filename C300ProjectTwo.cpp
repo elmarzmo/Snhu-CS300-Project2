@@ -3,10 +3,31 @@
 // Author      : Mohamed Elmarzougui
 
 #include <iostream>
+#include <vector>
+#include <string>
 
 using namespace std;
 
-void loadCourse(string inputPath, ) {
+class Course {
+    // private fields for a course object.
+private:
+    string courseId;
+    string courseTitle;
+    vector<string> coursePrerequisties;
+
+    // public methods for a course object.
+
+public:
+    Course()=default;
+    Course(string id, string title, vector<string> prerequisties);
+    
+    string  getCourseId();
+    string getCourseTitle();
+    vector<string> getCoursePrerequisites();;
+
+};
+
+void loadCourse(string inputPath, Course * courses) {
 
 }
 
