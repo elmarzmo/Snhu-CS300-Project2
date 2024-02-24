@@ -11,7 +11,7 @@
 
 using namespace std;
 
-
+struct Node;
 class Course {
     // private fields for a course object.
 private:
@@ -45,6 +45,7 @@ public:
     void Remove(string courseId);
     Course Search(string courseId);
     ~Course();
+    string getCourseId() const;
 
     
 };
@@ -79,11 +80,6 @@ void Course::destroyRecursive(Node* node) {
         delete node;
         node = nullptr;
     }
-}
-Course::Course() {
-    // root is equal to nullptr
-    root = nullptr;
-
 }
 void Course::InOrder() {
     // call inOrder function and pass root
@@ -264,6 +260,7 @@ Course::Course(string id, string courseTitle, vector<string> prerequisites) {
     this->courseId = id;
     this->courseTitle = courseTitle;
     this->coursePrerequisites = prerequisites;
+    root = nullptr;
 }
 
 string Course::getCourseId() {
@@ -276,6 +273,9 @@ string Course::getCourseTitle() {
 
 vector<string>  Course::getCoursePrerequisites() {
     return this->coursePrerequisites;
+}
+string Course::getCourseId() const {
+    return this->courseId;
 }
 void displayCourse(Course course) {
     vector<string> coursePrerequisites = course.getCoursePrerequisites();
@@ -298,7 +298,6 @@ void displayCourse(Course course) {
     cout << course.getCourseId() << ", " << course.getCourseTitle() << endl;
     cout << "Prerequisites: " << prerequisites << endl;
 }
-
 void loadCourse(string inputPath, vector<Course>& courses) {
     cout << "Loading input file " << inputPath << endl;
     // Open the file
@@ -316,9 +315,9 @@ void loadCourse(string inputPath, vector<Course>& courses) {
             vector<string> prerequisites;
             int index = 0;
             // Parse the line by commas
-            while (getline(ss,word,',')){
-                // Remove newline characters if any
-                word = regex_replace(word, regex(R"(\r\n|\r|\n)"), "");
+            while (getline(ss, word, ',')) {
+                // Remove leading and trailing whitespace
+                word = regex_replace(word, regex("^\\s+|\\s+$"), "");
                 // Assign values based on index
                 if (index == 0) {
                     id = word;
@@ -360,23 +359,38 @@ int main()
         switch (choice) {
         case 1:
             cout << "Enter the path to the input file:  ";
+            cin.ignore(); // Clear the input buffer
             cin >> inputPath;
+         //   getline(cin, inputPath); // Read the entire line
             loadCourse(inputPath, courses);
+
+            
             break;
         case 2:
-            cout << "Here is a sample schedule:" << endl << endl;
-            courses[0].InOrder(); 
+            if (courses.empty()) {
+                cout << "No courses loaded. Please load courses first." << endl;
+            }
+            else {
+                cout << "Here is a sample schedule:" << endl << endl;
+                courses[0].InOrder();
+            }
             break;
         case 3:
             cout << "What course do you want to know about? ";
             cin >> courseKey;
-            for (const auto& course : courses) {
-                if (course.getCourseId() == courseKey) {
-                    displayCourse(course);
-                    break;
+            cout << "Course key entered: " << courseKey << endl;
+            {
+                bool found = false;
+                for (const auto& crs : courses) {
+                    if (crs.getCourseId() == courseKey) {
+                        displayCourse(crs);
+                        found = true;
+                        break;
+                    }
                 }
+                if (!found)
+                    cout << "Course Id " << courseKey << " not found." << endl;
             }
-            cout << "Course Id " << courseKey << " not found." << endl;
             break;
         case 9:
             cout << "Good bye." << endl;
