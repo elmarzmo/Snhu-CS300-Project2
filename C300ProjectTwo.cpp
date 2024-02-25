@@ -53,6 +53,9 @@ struct Node {
     Course course;
     Node* left;
     Node* right;
+    string courseId;
+    string courseTitle;
+    vector<string> coursePrerequisites;
 
     // default constructor
     Node() {
@@ -316,19 +319,24 @@ void loadCourse(string inputPath, vector<Course>& courses) {
             int index = 0;
             // Parse the line by commas
             while (getline(ss, word, ',')) {
-                // Remove leading and trailing whitespace
-                word = regex_replace(word, regex("^\\s+|\\s+$"), "");
-                // Assign values based on index
-                if (index == 0) {
-                    id = word;
-                }
-                else if (index == 1) {
-                    title = word;
-                }
-                else {
-                    prerequisites.push_back(word);
-                }
-                index++;
+                
+                    // Remove leading and trailing whitespace
+                    word = regex_replace(word, regex("^\\s+|\\s+$"), "");
+                    word = regex_replace(word, regex(R"(\r\n|\r|\n)"), "");
+
+                    // Assign values based on index
+                    if (index == 0) {
+                        id = word;
+                    }
+                    else if (index == 1) {
+                        title = word;
+                    }
+                    else {
+                        prerequisites.push_back(word);
+                    }
+                    index++;
+                    
+                
             }
             Course course = Course(id, title, prerequisites);
             courses.push_back(course);
@@ -370,9 +378,12 @@ int main()
             if (courses.empty()) {
                 cout << "No courses loaded. Please load courses first." << endl;
             }
-            else {
+            else if (!courses[0].getCourseId().empty()) { // Check if the first course ID is not empty
                 cout << "Here is a sample schedule:" << endl << endl;
                 courses[0].InOrder();
+            }
+            else {
+                cout << "No courses available to display." << endl;
             }
             break;
         case 3:
